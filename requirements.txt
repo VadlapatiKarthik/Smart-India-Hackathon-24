@@ -1,0 +1,6 @@
+### 📄 `requirements.txt`
+
+```txt
+flask
+pandas
+openpyxl
