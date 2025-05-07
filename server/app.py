@@ -1,15 +1,19 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash
-from utils.helpers import get_user_by_credentials  # 🔁 imported helper function
+from utils.helpers import get_user_by_credentials
 import os
 
-app = Flask(__name__)
-app.secret_key = 'supersecretkey'  # Replace with env var in production
+# Initialize Flask app with correct template path
+app = Flask(
+    __name__,
+    template_folder='../client/templates',  # dashboard HTMLs
+    static_folder='../client/static'        # if you add any CSS/JS later
+)
 
+app.secret_key = 'supersecretkey'  # Use os.environ.get("SECRET_KEY") in production
 
 @app.route('/')
 def home():
-    return render_template('../client/index.html')
-
+    return render_template('index.html')  # now resolved from client/
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -33,36 +37,32 @@ def login():
             flash("Invalid credentials or role.")
             return redirect(url_for('login'))
 
-    return render_template('../client/index.html')
-
+    return render_template('index.html')
 
 @app.route('/logout')
 def logout():
     session.clear()
     return redirect(url_for('home'))
 
-
 @app.route('/user/dashboard')
 def user_dashboard():
     if session.get('role') != 'user':
         return redirect(url_for('login'))
-    return render_template('../client/templates/userdashboard.html', username=session['username'])
-
+    return render_template('userdashboard.html', username=session['username'])
 
 @app.route('/healthcare/dashboard')
 def healthcare_dashboard():
     if session.get('role') != 'healthcare':
         return redirect(url_for('login'))
-    return render_template('../client/templates/healthcare-dashboard.html', username=session['username'])
-
+    return render_template('healthcare-dashboard.html', username=session['username'])
 
 @app.route('/government/dashboard')
 def government_dashboard():
     if session.get('role') != 'government':
         return redirect(url_for('login'))
-    return render_template('../client/templates/government-dashboard.html', username=session['username'])
+    return render_template('government-dashboard.html', username=session['username'])
 
-
+# 🟢 Bind to 0.0.0.0 so Render can expose it
 if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 10000))
+    port = int(os.environ.get("PORT", 10000))  # Render auto-assigns this
     app.run(host='0.0.0.0', port=port)
