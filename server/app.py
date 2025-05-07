@@ -3,11 +3,8 @@ from utils.helpers import get_user_by_credentials
 import os
 
 # Initialize Flask app with correct template path
-app = Flask(
-    __name__,
-    template_folder='../client/templates',  # dashboard HTMLs
-    static_folder='../client/static'        # if you add any CSS/JS later
-)
+app = Flask(__name__) 
+
 
 app.secret_key = 'supersecretkey'  # Use os.environ.get("SECRET_KEY") in production
 
