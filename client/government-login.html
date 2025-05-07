@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Government Login</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f0f0;
+            text-align: center;
+        }
+        .login-box {
+            margin-top: 100px;
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 10px;
+            width: 300px;
+            margin: auto;
+            box-shadow: 0px 0px 10px 0px #0000001a;
+        }
+        h2 {
+            margin-bottom: 30px;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #007BFF;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-box">
+        <h2>Government Login</h2>
+        <form id="governmentLoginForm">
+            <input type="email" id="email" placeholder="Email ID" required><br>
+            <input type="password" id="password" placeholder="Password" required><br>
+            <button type="button" onclick="validateGovernment()">Login</button>
+            <p class="error" id="errorMsg"></p>
+        </form>
+    </div>
+
+    <script>
+        function validateGovernment() {
+            var email = document.getElementById("email").value;
+            var password = document.getElementById("password").value;
+            var errorMsg = document.getElementById("errorMsg");
+
+            // Hardcoded credentials for Government
+            var validEmails = ["karthik@gov.in", "vishnu@gov.in"];
+            var validPasswords = ["karthik@123", "vishnu@123"];
+
+            // Check if email exists and match the password at the same index
+            var userIndex = validEmails.indexOf(email);
+            if (userIndex !== -1 && validPasswords[userIndex] === password) {
+                window.location.href = "government-dashboard.html";
+            } else {
+                errorMsg.textContent = "Invalid email or password!";
+            }
+        }
+    </script>
+</body>
+</html

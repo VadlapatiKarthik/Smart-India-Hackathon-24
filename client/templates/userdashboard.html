@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Disease Information Lookup</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            text-align: center;
+        }
+        input, select {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        .info-box {
+            background-color: #e7f3ff;
+            padding: 15px;
+            border-radius: 5px;
+            display: none;
+        }
+        .info-box p {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Health Scheme Information</h2>
+    <label for="disease-select">Select a Disease:</label>
+    <select id="disease-select">
+        <option value="">--Select a Disease--</option>
+        <!-- Options will be dynamically added here -->
+    </select>
+
+    <label for="age-input">Enter Age:</label>
+    <input type="number" id="age-input" placeholder="Enter your age">
+
+    <label for="income-select">Select Income Level:</label>
+    <select id="income-select">
+        <option value="">--Select Income Level--</option>
+        <!-- Fixed options for income levels -->
+    </select>
+
+    <label for="gender-select">Select Gender:</label>
+    <select id="gender-select">
+        <option value="">--Select Gender--</option>
+        <option value="male">Male</option>
+        <option value="female">Female</option>
+        <option value="other">Other</option>
+    </select>
+
+    <button onclick="fetchSchemes()">Find Schemes</button>
+
+    <div class="info-box" id="scheme-info"></div>
+</div>
+
+<script>
+    async function populateOptions() {
+        try {
+            const diseasesResponse = await fetch('/get_diseases');
+            const incomeResponse = await fetch('/get_income_ranges');
+
+            const diseases = await diseasesResponse.json();
+            const incomeRanges = await incomeResponse.json();
+
+            const diseaseSelect = document.getElementById('disease-select');
+            const incomeSelect = document.getElementById('income-select');
+
+            // Populate disease options
+            diseases.forEach(disease => {
+                const option = document.createElement('option');
+                option.value = disease.toLowerCase();
+                option.textContent = disease;
+                diseaseSelect.appendChild(option);
+            });
+
+            // Populate income ranges
+            incomeRanges.forEach(range => {
+                const option = document.createElement('option');
+                option.value = range.toLowerCase();
+                option.textContent = range;
+                incomeSelect.appendChild(option);
+            });
+        } catch (error) {
+            console.error('Error populating options:', error);
+        }
+    }
+
+    async function fetchSchemes() {
+        const selectedDisease = document.getElementById("disease-select").value;
+        const age = document.getElementById("age-input").value;
+        const income = document.getElementById("income-select").value;
+        const gender = document.getElementById("gender-select").value;
+
+        try {
+            const response = await fetch(`/get_schemes?disease=${encodeURIComponent(selectedDisease)}&age=${encodeURIComponent(age)}&gender=${encodeURIComponent(gender)}&income=${encodeURIComponent(income)}`);
+            const schemes = await response.json();
+
+            const infoBox = document.getElementById("scheme-info");
+
+            if (schemes.error) {
+                infoBox.innerHTML = `<p>${schemes.error}</p>`;
+            } else {
+                infoBox.innerHTML = schemes.map(scheme => `
+                    <p><strong>Scheme Name:</strong> ${scheme['Scheme Name']}</p>
+                    <p><strong>Age Group:</strong> ${scheme['Age Group']}</p>
+                    <p><strong>Income Level (INR):</strong> ${scheme['Income Level (INR)']}</p>
+                    <p><strong>Gender:</strong> ${scheme['Gender']}</p>
+                    <p><strong>Description of the Scheme:</strong> ${scheme['Description of the Scheme']}</p>
+                    <hr>
+                `).join('');
+            }
+
+            infoBox.style.display = 'block';
+        } catch (error) {
+            console.error('Error fetching schemes:', error);
+        }
+    }
+
+    // Populate options when the page loads
+    window.onload = populateOptions;
+</script>
+
+</body>
+</html>

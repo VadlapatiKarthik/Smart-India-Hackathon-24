@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Disease Information Lookup</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            padding: 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            text-align: center;
+        }
+        select {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+        .info-box {
+            background-color: #e7f3ff;
+            padding: 15px;
+            border-radius: 5px;
+            display: none;
+        }
+        .info-box p {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Health Scheme Information</h2>
+    <label for="disease-select">Select a Disease:</label>
+    <select id="disease-select" onchange="fetchSchemes()">
+        <option value="">--Select a Disease--</option>
+        <option value="Diabetes">Diabetes</option>
+        <option value="Hypertension">Hypertension</option>
+        <option value="Asthma">Asthma</option>
+        <option value="COPD">Chronic Obstructive Pulmonary Disease (COPD)</option>
+        <option value="CAD">Coronary Artery Disease (CAD)</option>
+        <option value="Stroke">Stroke</option>
+        <option value="Alzheimer">Alzheimer's Disease</option>
+        <option value="Parkinson">Parkinson's Disease</option>
+        <option value="CKD">Chronic Kidney Disease (CKD)</option>
+        <option value="Hepatitis B">Hepatitis B</option>
+        <option value="TB">Tuberculosis (TB)</option>
+        <option value="Malaria">Malaria</option>
+        <option value="HIV/AIDS">HIV/AIDS</option>
+        <option value="Influenza">Influenza</option>
+        <option value="Pneumonia">Pneumonia</option>
+        <option value="Rheumatoid Arthritis">Rheumatoid Arthritis</option>
+        <option value="Osteoporosis">Osteoporosis</option>
+        <option value="Cancer">Cancer</option>
+        <option value="Anaemia">Anaemia</option>
+        <option value="Migraine">Migraine</option>
+    </select>
+
+    <div class="info-box" id="info-box">
+        <h3>Scheme Details</h3>
+        <div id="scheme-list"></div>
+    </div>
+</div>
+
+<script>
+    function fetchSchemes() {
+        const selectedDisease = document.getElementById('disease-select').value;
+
+        if (selectedDisease) {
+            fetch(`/get_schemes?disease=${selectedDisease}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error) {
+                        alert(data.error);
+                    } else {
+                        displaySchemes(data);
+                    }
+                })
+                .catch(error => console.error('Error fetching data:', error));
+        } else {
+            document.getElementById('info-box').style.display = 'none';
+        }
+    }
+
+    function displaySchemes(schemes) {
+        const infoBox = document.getElementById('info-box');
+        const schemeList = document.getElementById('scheme-list');
+
+        if (schemes.length === 0) {
+            schemeList.innerHTML = '<p>No schemes found for the selected disease.</p>';
+        } else {
+            let content = '';
+            schemes.forEach(scheme => {
+                content += `
+                    <p><strong>Scheme Name:</strong> ${scheme['SchemeName'] || scheme['Scheme Name']}</p>
+                    <p><strong>Age Group:</strong> ${scheme['AgeGroup'] || scheme['Age Group']}</p>
+                    <p><strong>Gender:</strong> ${scheme['Gender']}</p>
+                    <p><strong>Income Level (INR):</strong> ${scheme['Income Level (INR)'] || scheme['Income Level(INR)']}</p>
+                    <p><strong>Description of the Scheme:</strong> ${scheme['Description of the Scheme']}</p>
+                    <hr>
+                `;
+            });
+            schemeList.innerHTML = content;
+        }
+        infoBox.style.display = 'block';
+    }
+</script>
+
+</body>
+</html>
